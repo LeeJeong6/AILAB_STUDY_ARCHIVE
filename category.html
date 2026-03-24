@@ -128,47 +128,107 @@
       color: var(--color-dark);
     }
 
+    .upload-fab {
+      position: fixed;
+      top: 50%;
+      right: 1.25rem;
+      transform: translateY(-50%);
+      border: none;
+      border-radius: 999px;
+      background: var(--color-primary);
+      color: var(--color-bg);
+      padding: 0.8rem 1.1rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: background-color var(--transition);
+      z-index: 220;
+    }
+
+    .upload-fab:hover {
+      background: var(--color-dark);
+    }
+
+    .upload-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition);
+      z-index: 210;
+    }
+
+    .upload-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .upload-drawer {
+      position: fixed;
+      top: 0;
+      right: -420px;
+      width: min(90vw, 400px);
+      height: 100%;
+      background: var(--color-bg);
+      border-left: 1px solid var(--color-border);
+      box-shadow: -2px 0 20px rgba(0, 0, 0, 0.2);
+      transition: right var(--transition);
+      z-index: 230;
+    }
+
+    .upload-drawer.active {
+      right: 0;
+    }
+
+    .upload-drawer-inner {
+      height: 100%;
+      overflow-y: auto;
+      padding: 1.25rem;
+    }
+
+    .upload-drawer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .upload-drawer-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--color-dark);
+    }
+
+    .close-upload-btn {
+      border: none;
+      border-radius: var(--border-radius);
+      background: var(--color-bg-secondary);
+      color: var(--color-text);
+      padding: 0.35rem 0.65rem;
+      font-size: 1.15rem;
+      line-height: 1;
+      cursor: pointer;
+      transition: background-color var(--transition);
+    }
+
+    .close-upload-btn:hover {
+      background: var(--color-border);
+    }
+
+    .drawer-desc {
+      font-size: 0.85rem;
+      color: var(--color-text-secondary);
+      margin-bottom: 1rem;
+    }
+
     .upload-section {
       background: var(--color-bg-secondary);
       border: 1px solid var(--color-border);
       border-radius: var(--border-radius);
-      padding: 1.5rem;
-      margin-bottom: 2rem;
-    }
-
-    .upload-section h3 {
-      font-size: 1.125rem;
-      font-weight: 700;
-      color: var(--color-dark);
-      margin-bottom: 1rem;
-    }
-
-    .upload-toggle-btn {
-      border: none;
-      border-radius: var(--border-radius);
-      background: var(--color-primary);
-      color: var(--color-bg);
-      padding: 0.65rem 1.5rem;
-      font-size: 0.95rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background-color var(--transition);
-      margin-bottom: 2rem;
-      display: inline-block;
-    }
-
-    .upload-toggle-btn:hover {
-      background: var(--color-dark);
-    }
-
-    .upload-form-container {
-      display: none;
-      overflow: hidden;
-      transition: max-height 0.3s ease-out;
-    }
-
-    .upload-form-container.active {
-      display: block;
+      padding: 1rem;
     }
 
     .form-grid {
@@ -257,6 +317,10 @@
 
     .save-msg.error {
       color: #e74c3c;
+    }
+
+    body.drawer-open {
+      overflow: hidden;
     }
 
     .entry-list {
@@ -407,6 +471,13 @@
       .form-grid {
         grid-template-columns: 1fr;
       }
+
+      .upload-fab {
+        top: auto;
+        bottom: 1.25rem;
+        right: 1rem;
+        transform: none;
+      }
     }
   </style>
 </head>
@@ -429,46 +500,51 @@
       <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--color-dark); margin-bottom: 1.5rem;">Uploaded Materials</h2>
       <div class="entry-list" id="entryList"></div>
     </section>
-
-    <!-- Upload Section - NOW AT BOTTOM -->
-    <section style="margin-top: 3rem;">
-      <button class="upload-toggle-btn" id="uploadToggleBtn">📤 Upload New Material</button>
-
-      <div class="upload-form-container" id="uploadFormContainer">
-        <section class="upload-section">
-          <h3>📤 Upload New Material</h3>
-          <form id="uploadForm" novalidate>
-            <div class="form-grid">
-              <div class="field">
-                <label for="dateInput">Date</label>
-                <input id="dateInput" name="date" type="date" required />
-              </div>
-              <div class="field">
-                <label for="presenterInput">Presenter</label>
-                <input id="presenterInput" name="presenter" type="text" placeholder="e.g., John Doe" required />
-              </div>
-              <div class="field field-full">
-                <label for="titleInput">Title</label>
-                <input id="titleInput" name="title" type="text" placeholder="Enter title" required />
-              </div>
-              <div class="field field-full">
-                <label for="descInput">Description</label>
-                <textarea id="descInput" name="description" placeholder="Enter description" required></textarea>
-              </div>
-              <div class="field field-full">
-                <label for="fileInput">File (PDF, PPT, PPTX)</label>
-                <input id="fileInput" name="file" type="file" accept=".pdf,.ppt,.pptx,application/pdf,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation" required />
-              </div>
-            </div>
-            <div class="actions">
-              <button class="save-btn" type="submit" id="submitBtn">Upload</button>
-              <span class="save-msg" id="saveMsg"></span>
-            </div>
-          </form>
-        </section>
-      </div>
-    </section>
   </main>
+
+  <button class="upload-fab" id="openUploadBtn" type="button" aria-controls="uploadDrawer" aria-expanded="false">
+    Upload
+  </button>
+  <div class="upload-backdrop" id="uploadBackdrop"></div>
+  <aside class="upload-drawer" id="uploadDrawer" aria-hidden="true">
+    <div class="upload-drawer-inner">
+      <div class="upload-drawer-header">
+        <h3 class="upload-drawer-title">Upload New Material</h3>
+        <button class="close-upload-btn" id="closeUploadBtn" type="button" aria-label="Close upload panel">&times;</button>
+      </div>
+      <p class="drawer-desc">Enter date, presenter, and file information to add a new session.</p>
+      <section class="upload-section">
+        <form id="uploadForm" novalidate>
+          <div class="form-grid">
+            <div class="field">
+              <label for="dateInput">Date</label>
+              <input id="dateInput" name="date" type="date" required />
+            </div>
+            <div class="field">
+              <label for="presenterInput">Presenter</label>
+              <input id="presenterInput" name="presenter" type="text" placeholder="e.g., John Doe" required />
+            </div>
+            <div class="field field-full">
+              <label for="titleInput">Title</label>
+              <input id="titleInput" name="title" type="text" placeholder="Enter title" required />
+            </div>
+            <div class="field field-full">
+              <label for="descInput">Description</label>
+              <textarea id="descInput" name="description" placeholder="Enter description" required></textarea>
+            </div>
+            <div class="field field-full">
+              <label for="fileInput">File (PDF, PPT, PPTX)</label>
+              <input id="fileInput" name="file" type="file" accept=".pdf,.ppt,.pptx,application/pdf,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation" required />
+            </div>
+          </div>
+          <div class="actions">
+            <button class="save-btn" type="submit" id="submitBtn">Upload</button>
+            <span class="save-msg" id="saveMsg"></span>
+          </div>
+        </form>
+      </section>
+    </div>
+  </aside>
 
   <footer>
     &copy; 2026 KMU AI Lab. All rights reserved.
@@ -484,8 +560,6 @@
       vibe: { label: 'Vibe Coding' },
       math: { label: 'Math Study' }
     };
-
-    const STATIC_ENTRIES = [];
 
     const params = new URLSearchParams(window.location.search);
     const category = params.get('cat');
@@ -520,16 +594,28 @@
 
     categoryTitle.textContent = CATEGORY_META[category].label;
 
-    // Upload form toggle
-    const uploadToggleBtn = document.getElementById('uploadToggleBtn');
-    const uploadFormContainer = document.getElementById('uploadFormContainer');
+    const openUploadBtn = document.getElementById('openUploadBtn');
+    const closeUploadBtn = document.getElementById('closeUploadBtn');
+    const uploadDrawer = document.getElementById('uploadDrawer');
+    const uploadBackdrop = document.getElementById('uploadBackdrop');
 
-    uploadToggleBtn.addEventListener('click', () => {
-      uploadFormContainer.classList.toggle('active');
-      if (uploadFormContainer.classList.contains('active')) {
-        uploadToggleBtn.textContent = '❌ Close Upload Form';
-      } else {
-        uploadToggleBtn.textContent = '📤 Upload New Material';
+    function setDrawerState(isOpen) {
+      uploadDrawer.classList.toggle('active', isOpen);
+      uploadBackdrop.classList.toggle('active', isOpen);
+      document.body.classList.toggle('drawer-open', isOpen);
+      openUploadBtn.setAttribute('aria-expanded', String(isOpen));
+      uploadDrawer.setAttribute('aria-hidden', String(!isOpen));
+    }
+
+    openUploadBtn.addEventListener('click', () => {
+      setMessage('', 'normal');
+      setDrawerState(true);
+    });
+    closeUploadBtn.addEventListener('click', () => setDrawerState(false));
+    uploadBackdrop.addEventListener('click', () => setDrawerState(false));
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && uploadDrawer.classList.contains('active')) {
+        setDrawerState(false);
       }
     });
 
@@ -582,7 +668,7 @@
           request.onerror = () => reject(request.error);
         });
 
-        const merged = [...STATIC_ENTRIES, ...uploads]
+        const merged = uploads
           .filter((entry) => entry.category === category)
           .map((entry) => ({
             ...entry,
@@ -664,37 +750,28 @@
       const actions = document.createElement('div');
       actions.className = 'entry-actions';
 
-      // View Session link (for both seed and upload)
+      // View Session link
       const viewLink = document.createElement('a');
-      if (entry.kind === 'seed' && entry.staticLink) {
-        viewLink.href = entry.staticLink;
-        viewLink.target = '_blank';
-        viewLink.rel = 'noreferrer noopener';
-      } else {
-        viewLink.href = `session.html?id=${entry.id}&cat=${category}`;
-      }
+      viewLink.href = `session.html?id=${entry.id}&cat=${category}`;
       viewLink.textContent = 'View Session';
       actions.appendChild(viewLink);
 
-      // Delete Session button (for all types except static seed entries)
-      if (entry.kind !== 'seed') {
-        const deleteSessionBtn = document.createElement('button');
-        deleteSessionBtn.type = 'button';
-        deleteSessionBtn.textContent = 'Delete Session';
-        deleteSessionBtn.className = 'delete-btn';
-        deleteSessionBtn.addEventListener('click', async () => {
-          const ok = window.confirm('Are you sure you want to delete this session? This action cannot be undone.');
-          if (!ok) {
-            return;
-          }
-          await deleteEntry(entry.id);
-          await renderEntries();
-          broadcastChange('entry-deleted', { id: entry.id, category });
-        });
-        actions.appendChild(deleteSessionBtn);
-      }
+      const deleteSessionBtn = document.createElement('button');
+      deleteSessionBtn.type = 'button';
+      deleteSessionBtn.textContent = 'Delete Session';
+      deleteSessionBtn.className = 'delete-btn';
+      deleteSessionBtn.addEventListener('click', async () => {
+        const ok = window.confirm('Are you sure you want to delete this session? This action cannot be undone.');
+        if (!ok) {
+          return;
+        }
+        await deleteEntry(entry.id);
+        await renderEntries();
+        broadcastChange('entry-deleted', { id: entry.id, category });
+      });
+      actions.appendChild(deleteSessionBtn);
 
-      if (entry.kind === 'upload' && entry.fileBlob) {
+      if (entry.fileBlob) {
         const openBtn = document.createElement('button');
         openBtn.type = 'button';
         openBtn.textContent = 'Open File';
@@ -868,12 +945,11 @@
         await renderEntries();
         broadcastChange('entry-added', { id: entry.id, category });
 
-        // Close the upload form after successful upload
+        // Close the upload drawer after successful upload
         setTimeout(() => {
-          uploadFormContainer.classList.remove('active');
-          uploadToggleBtn.textContent = '📤 Upload New Material';
+          setDrawerState(false);
           setMessage('', 'normal');
-        }, 1500);
+        }, 900);
       } catch (error) {
         console.error(error);
         setMessage('An error occurred during upload.', 'error');
