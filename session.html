@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Session Details</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --color-primary: #6A7C9C;
+      --color-dark: #151D2A;
+      --color-text: #000000;
+      --color-text-secondary: #757575;
+      --color-bg: #FFFFFF;
+      --color-bg-secondary: #F7F7F7;
+      --color-accent: #116dff;
+      --color-border: #C7C7C7;
+
+      --site-width: 980px;
+      --border-radius: 5px;
+      --shadow: 0 1px 4px rgba(0,0,0,.6);
+      --transition: 0.4s ease;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+      background: var(--color-bg);
+      color: var(--color-text);
+      font-family: 'Roboto', 'Noto Sans KR', sans-serif;
+      font-size: 16px;
+      line-height: 1.4em;
+    }
+
+    .header {
+      width: 100%;
+      background: var(--color-bg);
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-inner {
+      max-width: var(--site-width);
+      margin: 0 auto;
+      padding: 1.2rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .site-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-dark);
+      margin: 0;
+      cursor: pointer;
+      transition: color var(--transition);
+    }
+
+    .site-title:hover {
+      color: var(--color-primary);
+    }
+
+    .lab-link {
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+      background: var(--color-primary);
+      color: var(--color-bg);
+      border-radius: var(--border-radius);
+      padding: 0.5rem 1.2rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: background-color var(--transition);
+    }
+
+    .lab-link:hover {
+      background: var(--color-dark);
+    }
+
+    .container {
+      max-width: var(--site-width);
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    .main {
+      padding: 2rem 0 4rem;
+    }
+
+    .back-link {
+      text-decoration: none;
+      color: var(--color-primary);
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color var(--transition);
+      display: inline-block;
+      margin-bottom: 1.5rem;
+    }
+
+    .back-link:hover {
+      color: var(--color-dark);
+    }
+
+    .session-header {
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 2px solid var(--color-border);
+    }
+
+    .session-meta {
+      font-size: 0.9rem;
+      color: var(--color-text-secondary);
+      margin-bottom: 0.75rem;
+    }
+
+    .session-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--color-dark);
+      margin-bottom: 1rem;
+      line-height: 1.3;
+    }
+
+    .category-badge {
+      display: inline-block;
+      background: var(--color-primary);
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--border-radius);
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+
+    .session-content {
+      margin-bottom: 2rem;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-dark);
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--color-border);
+    }
+
+    .content-box {
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    .summary-box {
+      background: #f0f7ff;
+      border: 1px solid #b3d9ff;
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    .summary-box h3 {
+      font-size: 1.125rem;
+      color: var(--color-dark);
+      margin-bottom: 1rem;
+    }
+
+    .summary-placeholder {
+      background: #fff9e6;
+      border: 1px dashed #ffd966;
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      text-align: center;
+      color: var(--color-text-secondary);
+    }
+
+    .summary-placeholder p {
+      margin-bottom: 0.5rem;
+    }
+
+    .file-info {
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius);
+      padding: 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+    .file-info p {
+      margin-bottom: 0.5rem;
+      color: var(--color-text-secondary);
+      font-size: 0.95rem;
+    }
+
+    .file-info strong {
+      color: var(--color-text);
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+
+    .btn {
+      text-decoration: none;
+      border: 1px solid var(--color-primary);
+      border-radius: var(--border-radius);
+      background: var(--color-primary);
+      color: white;
+      padding: 0.5rem 1.5rem;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: all var(--transition);
+      cursor: pointer;
+      font-family: inherit;
+      display: inline-block;
+    }
+
+    .btn:hover {
+      background: var(--color-dark);
+      border-color: var(--color-dark);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: var(--color-primary);
+    }
+
+    .btn-secondary:hover {
+      background: var(--color-primary);
+      color: white;
+    }
+
+    .error-message {
+      background: #ffe6e6;
+      border: 1px solid #ff9999;
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      margin: 2rem 0;
+      text-align: center;
+      color: #c00;
+    }
+
+    footer {
+      border-top: 1px solid var(--color-border);
+      text-align: center;
+      color: var(--color-text-secondary);
+      font-size: 0.85rem;
+      padding: 2rem 1rem;
+      background: var(--color-bg-secondary);
+    }
+
+    @media (max-width: 640px) {
+      .session-title {
+        font-size: 1.5rem;
+      }
+
+      .section-title {
+        font-size: 1.25rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <h1 class="site-title">Lab Seminar Archive</h1>
+      <a class="lab-link" href="https://ailab.kookmin.ac.kr/" target="_blank" rel="noreferrer noopener">KMU AI LAB</a>
+    </div>
+  </header>
+
+  <main class="container main">
+    <a class="back-link" id="backLink">← Back</a>
+
+    <div id="sessionContent">
+      <div class="error-message">Loading session...</div>
+    </div>
+  </main>
+
+  <footer>
+    &copy; 2026 KMU AI Lab. All rights reserved.
+  </footer>
+
+  <script>
+    const DB_NAME = 'lab-seminar-archive-db';
+    const DB_VERSION = 1;
+    const UPLOAD_STORE = 'uploads';
+
+    const CATEGORY_META = {
+      paper: { label: 'Paper Seminar', link: 'category.html?cat=paper' },
+      vibe: { label: 'Vibe Coding', link: 'category.html?cat=vibe' },
+      math: { label: 'Math Study', link: 'category.html?cat=math' }
+    };
+
+    // Get session ID from URL
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get('id');
+    const fromCategory = params.get('cat');
+
+    // Set back link
+    const backLink = document.getElementById('backLink');
+    if (fromCategory && CATEGORY_META[fromCategory]) {
+      backLink.href = CATEGORY_META[fromCategory].link;
+    } else {
+      backLink.href = 'index.html';
+    }
+
+    function openDatabase() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+        request.onupgradeneeded = (event) => {
+          const db = event.target.result;
+          if (!db.objectStoreNames.contains(UPLOAD_STORE)) {
+            const uploadStore = db.createObjectStore(UPLOAD_STORE, { keyPath: 'id' });
+            uploadStore.createIndex('category', 'category', { unique: false });
+            uploadStore.createIndex('date', 'date', { unique: false });
+          }
+        };
+
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    async function loadSession(id) {
+      try {
+        const db = await openDatabase();
+        return await new Promise((resolve, reject) => {
+          const tx = db.transaction(UPLOAD_STORE, 'readonly');
+          const store = tx.objectStore(UPLOAD_STORE);
+          const request = store.get(id);
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = () => reject(request.error);
+        });
+      } catch (error) {
+        console.error(error);
+        return null;
+      }
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    async function renderSession(session) {
+      const contentDiv = document.getElementById('sessionContent');
+
+      if (!session) {
+        contentDiv.innerHTML = `
+          <div class="error-message">
+            Session not found. The session may have been deleted or the link is invalid.
+            <br><br>
+            <a href="index.html" class="btn">Return to Home</a>
+          </div>
+        `;
+        return;
+      }
+
+      const categoryInfo = CATEGORY_META[session.category] || { label: 'Unknown' };
+
+      let html = `
+        <div class="session-header">
+          <div class="category-badge">${escapeHtml(categoryInfo.label)}</div>
+          <h1 class="session-title">${escapeHtml(session.title || '(No Title)')}</h1>
+          <div class="session-meta">
+            ${escapeHtml(session.date || '-')} · ${escapeHtml(session.presenter || '-')}
+          </div>
+        </div>
+      `;
+
+      // File info section
+      if (session.fileName) {
+        html += `
+          <div class="file-info">
+            <p><strong>File:</strong> ${escapeHtml(session.fileName)}</p>
+            ${session.kind ? `<p><strong>Type:</strong> ${escapeHtml(session.kind)}</p>` : ''}
+            <div class="actions">
+        `;
+
+        if (session.fileBlob) {
+          html += `
+            <button class="btn" id="openFileBtn">Open File</button>
+            <button class="btn btn-secondary" id="downloadFileBtn">Download File</button>
+          `;
+        }
+
+        if (session.textBlob) {
+          html += `
+            <button class="btn btn-secondary" id="downloadTextBtn">Download Text</button>
+          `;
+        }
+
+        html += `
+            </div>
+          </div>
+        `;
+      }
+
+      // AI Summary Placeholder (for future implementation)
+      html += `
+        <div class="session-content">
+          <div class="summary-placeholder">
+            <p><strong>📝 AI Summary</strong></p>
+            <p style="font-size: 0.9rem;">AI summarization will be available in a future update.</p>
+            <p style="font-size: 0.85rem; margin-top: 0.5rem;">You can manually add summaries below in the description section.</p>
+          </div>
+        </div>
+      `;
+
+      // Description section
+      if (session.description) {
+        html += `
+          <div class="session-content">
+            <h2 class="section-title">Description</h2>
+            <div class="content-box">${escapeHtml(session.description)}</div>
+          </div>
+        `;
+      }
+
+      contentDiv.innerHTML = html;
+
+      // Add event listeners for file actions
+      if (session.fileBlob) {
+        const openBtn = document.getElementById('openFileBtn');
+        const downloadBtn = document.getElementById('downloadFileBtn');
+
+        if (openBtn) {
+          openBtn.addEventListener('click', () => {
+            const url = URL.createObjectURL(session.fileBlob);
+            window.open(url, '_blank', 'noopener,noreferrer');
+            setTimeout(() => URL.revokeObjectURL(url), 8000);
+          });
+        }
+
+        if (downloadBtn) {
+          downloadBtn.addEventListener('click', () => {
+            const url = URL.createObjectURL(session.fileBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = session.fileName;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 8000);
+          });
+        }
+      }
+
+      if (session.textBlob) {
+        const downloadTextBtn = document.getElementById('downloadTextBtn');
+        if (downloadTextBtn) {
+          downloadTextBtn.addEventListener('click', () => {
+            const url = URL.createObjectURL(session.textBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = session.textFileName || 'session-text.txt';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 8000);
+          });
+        }
+      }
+    }
+
+    // Add click handler for site title
+    document.querySelector('.site-title').addEventListener('click', () => {
+      window.location.href = 'index.html';
+    });
+
+    // Load and render session
+    if (!sessionId) {
+      document.getElementById('sessionContent').innerHTML = `
+        <div class="error-message">
+          No session ID provided.
+          <br><br>
+          <a href="index.html" class="btn">Return to Home</a>
+        </div>
+      `;
+    } else {
+      loadSession(sessionId).then(renderSession);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab Seminar Archive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --color-primary: #6A7C9C;
+      --color-dark: #151D2A;
+      --color-text: #000000;
+      --color-text-secondary: #757575;
+      --color-bg: #FFFFFF;
+      --color-bg-secondary: #F7F7F7;
+      --color-accent: #116dff;
+      --color-border: #C7C7C7;
+
+      --site-width: 980px;
+      --border-radius: 5px;
+      --shadow: 0 1px 4px rgba(0,0,0,.6);
+      --transition: 0.4s ease;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      background: var(--color-bg);
+      color: var(--color-text);
+      font-family: 'Roboto', 'Noto Sans KR', sans-serif;
+      font-size: 16px;
+      line-height: 1.4em;
+    }
+
+    .header {
+      width: 100%;
+      background: var(--color-bg);
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-inner {
+      max-width: var(--site-width);
+      margin: 0 auto;
+      padding: 1.2rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .site-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-dark);
+      margin: 0;
+      cursor: pointer;
+      transition: color var(--transition);
+    }
+
+    .site-title:hover {
+      color: var(--color-primary);
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .lab-link,
+    .study-btn {
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+      background: var(--color-primary);
+      color: var(--color-bg);
+      border: none;
+      border-radius: var(--border-radius);
+      padding: 0.5rem 1.2rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: background-color var(--transition);
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .study-btn {
+      background: #31B081;
+    }
+
+    .lab-link:hover,
+    .study-btn:hover {
+      background: var(--color-dark);
+    }
+
+    .study-btn:hover {
+      background: #2a9970;
+    }
+
+    .container {
+      max-width: var(--site-width);
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 3rem 0 2rem;
+    }
+
+    .page-title {
+      font-size: 2.25rem;
+      font-weight: 700;
+      color: var(--color-dark);
+      margin-bottom: 0.5rem;
+    }
+
+    .page-desc {
+      font-size: 1.125rem;
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+    }
+
+    .main {
+      padding: 2rem 0 4rem;
+    }
+
+    .section {
+      margin-bottom: 3rem;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-dark);
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--color-border);
+    }
+
+    .category-list {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+
+    .category-link {
+      text-decoration: none;
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius);
+      background: var(--color-bg);
+      padding: 1.5rem;
+      transition: all var(--transition);
+      display: block;
+      box-shadow: 0 1px 3px rgba(0,0,0,.1);
+    }
+
+    .category-link:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+      border-color: var(--color-primary);
+    }
+
+    .category-name {
+      font-size: 1.375rem;
+      font-weight: 700;
+      color: var(--color-dark);
+      margin-bottom: 0.75rem;
+    }
+
+    .category-desc {
+      color: var(--color-text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .preview-list {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .preview-group {
+      margin-bottom: 2rem;
+    }
+
+    .preview-group h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--color-primary);
+      margin-bottom: 1rem;
+    }
+
+    .preview-card {
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius);
+      background: var(--color-bg);
+      padding: 1.25rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,.1);
+      transition: all var(--transition);
+      cursor: pointer;
+    }
+
+    .preview-card:hover {
+      box-shadow: var(--shadow);
+      transform: translateY(-1px);
+    }
+
+    .preview-meta {
+      font-size: 0.85rem;
+      color: var(--color-text-secondary);
+      margin-bottom: 0.5rem;
+    }
+
+    .preview-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      line-height: 1.35;
+      color: var(--color-dark);
+      margin-bottom: 0.5rem;
+    }
+
+    .preview-desc {
+      font-size: 0.95rem;
+      color: var(--color-text-secondary);
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .preview-empty {
+      border: 1px dashed var(--color-border);
+      border-radius: var(--border-radius);
+      background: var(--color-bg-secondary);
+      padding: 1.25rem;
+      color: var(--color-text-secondary);
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    .preview-more {
+      display: inline-block;
+      margin-top: 1rem;
+      text-decoration: none;
+      font-size: 0.9rem;
+      color: var(--color-accent);
+      font-weight: 500;
+      transition: color var(--transition);
+    }
+
+    .preview-more:hover {
+      color: var(--color-primary);
+    }
+
+    footer {
+      border-top: 1px solid var(--color-border);
+      text-align: center;
+      color: var(--color-text-secondary);
+      font-size: 0.85rem;
+      padding: 2rem 1rem;
+      background: var(--color-bg-secondary);
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.6);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background-color: var(--color-bg);
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 4px 20px rgba(0,0,0,.3);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-dark);
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      padding: 0;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .close-btn:hover {
+      color: var(--color-text);
+    }
+
+    .recording-status {
+      text-align: center;
+      padding: 2rem 0;
+    }
+
+    .recording-indicator {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: #e74c3c;
+      margin: 0 auto 1rem;
+      animation: pulse 1.5s ease-in-out infinite;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 2rem;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.05); }
+    }
+
+    .recording-time {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-dark);
+      margin-bottom: 0.5rem;
+    }
+
+    .recording-label {
+      font-size: 0.9rem;
+      color: var(--color-text-secondary);
+      margin-bottom: 1.5rem;
+    }
+
+    .stop-recording-btn {
+      background: #e74c3c;
+      color: white;
+      border: none;
+      padding: 0.75rem 2rem;
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color var(--transition);
+    }
+
+    .stop-recording-btn:hover {
+      background: #c0392b;
+    }
+
+    @media (max-width: 640px) {
+      .header-inner {
+        flex-wrap: wrap;
+      }
+
+      .header-actions {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .page-title {
+        font-size: 1.75rem;
+      }
+
+      .category-list {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <h1 class="site-title">Lab Seminar Archive</h1>
+      <div class="header-actions">
+        <button class="study-btn" id="startStudyBtn">🎙️ Start Study Session</button>
+        <a class="lab-link" href="https://ailab.kookmin.ac.kr/" target="_blank" rel="noreferrer noopener">KMU AI LAB</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="hero container">
+    <h2 class="page-title">Research Lab Seminar Materials</h2>
+    <p class="page-desc">Archive for paper presentations, coding sessions, and math study materials.</p>
+  </div>
+
+  <main class="container main">
+    <section class="section">
+      <h2 class="section-title">Categories</h2>
+      <div class="category-list">
+        <a class="category-link" href="category.html?cat=paper">
+          <h3 class="category-name">Paper Seminar</h3>
+          <p class="category-desc">Collection of paper presentations and summary notes.</p>
+        </a>
+
+        <a class="category-link" href="category.html?cat=vibe">
+          <h3 class="category-name">Vibe Coding</h3>
+          <p class="category-desc">Hands-on coding sessions and implementation demos.</p>
+        </a>
+
+        <a class="category-link" href="category.html?cat=math">
+          <h3 class="category-name">Math Study</h3>
+          <p class="category-desc">Mathematical derivations and concept explanations.</p>
+        </a>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Recent Uploads</h2>
+      <div id="previewBoard"></div>
+    </section>
+  </main>
+
+  <footer>
+    &copy; 2026 KMU AI Lab. All rights reserved.
+  </footer>
+
+  <!-- Recording Modal -->
+  <div id="recordingModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Recording Study Session</h3>
+        <button class="close-btn" id="closeModalBtn">&times;</button>
+      </div>
+      <div class="recording-status">
+        <div class="recording-indicator">🎙️</div>
+        <div class="recording-time" id="recordingTime">00:00</div>
+        <div class="recording-label">Recording in progress...</div>
+        <button class="stop-recording-btn" id="stopRecordingBtn">Stop Recording</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const DB_NAME = 'lab-seminar-archive-db';
+    const DB_VERSION = 1;
+    const UPLOAD_STORE = 'uploads';
+
+    const CATEGORY_META = {
+      paper: { label: 'Paper Seminar', link: 'category.html?cat=paper' },
+      vibe: { label: 'Vibe Coding', link: 'category.html?cat=vibe' },
+      math: { label: 'Math Study', link: 'category.html?cat=math' }
+    };
+
+    const STATIC_ENTRIES = [
+      {
+        id: 'seed-paper-2026-03-20',
+        category: 'paper',
+        date: '2026-03-20',
+        presenter: 'Jeongik Lee',
+        title: 'GroupViT: Semantic Segmentation Emerges from Text Supervision',
+        description: 'Presentation covering the core ideas of GroupViT for semantic segmentation using only text supervision.',
+        kind: 'seed',
+        createdAt: '2026-03-20T09:00:00.000Z'
+      }
+    ];
+
+    const previewBoard = document.getElementById('previewBoard');
+
+    function openDatabase() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+        request.onupgradeneeded = (event) => {
+          const db = event.target.result;
+          if (!db.objectStoreNames.contains(UPLOAD_STORE)) {
+            const uploadStore = db.createObjectStore(UPLOAD_STORE, { keyPath: 'id' });
+            uploadStore.createIndex('category', 'category', { unique: false });
+            uploadStore.createIndex('date', 'date', { unique: false });
+          }
+        };
+
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    async function loadUploads() {
+      try {
+        const db = await openDatabase();
+        return await new Promise((resolve, reject) => {
+          const tx = db.transaction(UPLOAD_STORE, 'readonly');
+          const store = tx.objectStore(UPLOAD_STORE);
+          const request = store.getAll();
+          request.onsuccess = () => resolve(request.result || []);
+          request.onerror = () => reject(request.error);
+        });
+      } catch (error) {
+        console.error(error);
+        return [];
+      }
+    }
+
+    function mergeEntriesByCategory(entries, category) {
+      const merged = [...STATIC_ENTRIES, ...entries]
+        .filter((entry) => entry.category === category)
+        .map((entry) => ({
+          ...entry,
+          description: entry.description || 'No description available.'
+        }));
+
+      merged.sort((a, b) => {
+        const dateCompare = String(b.date || '').localeCompare(String(a.date || ''));
+        if (dateCompare !== 0) {
+          return dateCompare;
+        }
+        return String(b.createdAt || '').localeCompare(String(a.createdAt || ''));
+      });
+
+      return merged;
+    }
+
+    function previewCard(entry) {
+      return `
+        <article class="preview-card" data-entry-id="${entry.id}" data-category="${entry.category}">
+          <div class="preview-meta">${entry.date || '-'} · ${entry.presenter || '-'}</div>
+          <h4 class="preview-title">${escapeHtml(entry.title || '(No Title)')}</h4>
+          <p class="preview-desc">${escapeHtml(entry.description || '')}</p>
+        </article>
+      `;
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    async function renderPreviewBoard() {
+      const uploads = await loadUploads();
+      previewBoard.innerHTML = '';
+
+      Object.keys(CATEGORY_META).forEach((categoryKey) => {
+        const category = CATEGORY_META[categoryKey];
+        const categoryEntries = mergeEntriesByCategory(uploads, categoryKey).slice(0, 3);
+
+        const wrapper = document.createElement('section');
+        wrapper.className = 'preview-group';
+
+        const title = document.createElement('h3');
+        title.textContent = category.label;
+
+        const list = document.createElement('div');
+        list.className = 'preview-list';
+
+        if (categoryEntries.length === 0) {
+          const empty = document.createElement('p');
+          empty.className = 'preview-empty';
+          empty.textContent = 'No uploaded items yet.';
+          list.appendChild(empty);
+        } else {
+          list.innerHTML = categoryEntries.map(previewCard).join('');
+
+          // Add click handlers to cards
+          list.querySelectorAll('.preview-card').forEach((card) => {
+            card.addEventListener('click', () => {
+              const entryId = card.dataset.entryId;
+              const category = card.dataset.category;
+              window.location.href = `session.html?id=${entryId}&cat=${category}`;
+            });
+          });
+        }
+
+        const moreLink = document.createElement('a');
+        moreLink.className = 'preview-more';
+        moreLink.href = category.link;
+        moreLink.textContent = 'View More →';
+
+        wrapper.append(title, list, moreLink);
+        previewBoard.appendChild(wrapper);
+      });
+    }
+
+    // Recording functionality (NO AI - just save as text)
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let recordingStartTime = null;
+    let timerInterval = null;
+
+    const recordingModal = document.getElementById('recordingModal');
+    const startStudyBtn = document.getElementById('startStudyBtn');
+    const stopRecordingBtn = document.getElementById('stopRecordingBtn');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const recordingTime = document.getElementById('recordingTime');
+
+    startStudyBtn.addEventListener('click', async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+
+        mediaRecorder.ondataavailable = (event) => {
+          audioChunks.push(event.data);
+        };
+
+        mediaRecorder.onstop = async () => {
+          const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+          await saveRecording(audioBlob);
+          stream.getTracks().forEach(track => track.stop());
+        };
+
+        mediaRecorder.start();
+        recordingStartTime = Date.now();
+        recordingModal.classList.add('active');
+        startTimer();
+      } catch (error) {
+        console.error('Error starting recording:', error);
+        alert('Failed to start recording. Please check microphone permissions.');
+      }
+    });
+
+    stopRecordingBtn.addEventListener('click', () => {
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+        stopTimer();
+        recordingModal.classList.remove('active');
+      }
+    });
+
+    closeModalBtn.addEventListener('click', () => {
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        if (confirm('Stop recording and close?')) {
+          mediaRecorder.stop();
+          stopTimer();
+          recordingModal.classList.remove('active');
+        }
+      } else {
+        recordingModal.classList.remove('active');
+      }
+    });
+
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - recordingStartTime) / 1000);
+        const minutes = Math.floor(elapsed / 60).toString().padStart(2, '0');
+        const seconds = (elapsed % 60).toString().padStart(2, '0');
+        recordingTime.textContent = `${minutes}:${seconds}`;
+      }, 1000);
+    }
+
+    function stopTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+      recordingTime.textContent = '00:00';
+    }
+
+    async function saveRecording(audioBlob) {
+      const db = await openDatabase();
+      const timestamp = new Date().toISOString();
+      const audioFileName = `study-session-${timestamp}.webm`;
+
+      // Create a text file with recording info (NO AI)
+      const textContent = `Study Session Recording
+Date: ${new Date().toLocaleString()}
+Duration: ${recordingTime.textContent}
+
+This is an audio recording from a study session.
+Audio file: ${audioFileName}
+
+[To add AI summary in the future, this can be processed through the session page]
+`;
+
+      const textBlob = new Blob([textContent], { type: 'text/plain' });
+      const textFileName = `study-session-${timestamp}.txt`;
+
+      // Save recording entry
+      const entry = {
+        id: crypto.randomUUID(),
+        category: 'paper', // Default category
+        date: timestamp.split('T')[0],
+        presenter: 'Study Session',
+        title: `Study Session - ${new Date().toLocaleDateString()}`,
+        description: textContent,
+        fileName: audioFileName,
+        fileBlob: audioBlob,
+        textFileName: textFileName,
+        textBlob: textBlob,
+        kind: 'recording',
+        createdAt: timestamp
+      };
+
+      await new Promise((resolve, reject) => {
+        const tx = db.transaction(UPLOAD_STORE, 'readwrite');
+        const store = tx.objectStore(UPLOAD_STORE);
+        const request = store.put(entry);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      });
+
+      alert('Recording saved successfully as text file!');
+      renderPreviewBoard();
+    }
+
+    // Add click handler for site title
+    document.querySelector('.site-title').addEventListener('click', () => {
+      window.location.href = 'index.html';
+    });
+
+    renderPreviewBoard();
+  </script>
+</body>
+</html>
