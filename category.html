@@ -424,46 +424,50 @@
       <h2 class="category-title" id="categoryTitle"></h2>
     </section>
 
+    <!-- Uploaded Materials Section - NOW AT TOP -->
     <section>
       <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--color-dark); margin-bottom: 1.5rem;">Uploaded Materials</h2>
       <div class="entry-list" id="entryList"></div>
     </section>
 
-    <button class="upload-toggle-btn" id="uploadToggleBtn">📤 Upload New Material</button>
+    <!-- Upload Section - NOW AT BOTTOM -->
+    <section style="margin-top: 3rem;">
+      <button class="upload-toggle-btn" id="uploadToggleBtn">📤 Upload New Material</button>
 
-    <div class="upload-form-container" id="uploadFormContainer">
-      <section class="upload-section">
-        <h3>📤 Upload New Material</h3>
-        <form id="uploadForm" novalidate>
-          <div class="form-grid">
-            <div class="field">
-              <label for="dateInput">Date</label>
-              <input id="dateInput" name="date" type="date" required />
+      <div class="upload-form-container" id="uploadFormContainer">
+        <section class="upload-section">
+          <h3>📤 Upload New Material</h3>
+          <form id="uploadForm" novalidate>
+            <div class="form-grid">
+              <div class="field">
+                <label for="dateInput">Date</label>
+                <input id="dateInput" name="date" type="date" required />
+              </div>
+              <div class="field">
+                <label for="presenterInput">Presenter</label>
+                <input id="presenterInput" name="presenter" type="text" placeholder="e.g., John Doe" required />
+              </div>
+              <div class="field field-full">
+                <label for="titleInput">Title</label>
+                <input id="titleInput" name="title" type="text" placeholder="Enter title" required />
+              </div>
+              <div class="field field-full">
+                <label for="descInput">Description</label>
+                <textarea id="descInput" name="description" placeholder="Enter description" required></textarea>
+              </div>
+              <div class="field field-full">
+                <label for="fileInput">File (PDF, PPT, PPTX)</label>
+                <input id="fileInput" name="file" type="file" accept=".pdf,.ppt,.pptx,application/pdf,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation" required />
+              </div>
             </div>
-            <div class="field">
-              <label for="presenterInput">Presenter</label>
-              <input id="presenterInput" name="presenter" type="text" placeholder="e.g., John Doe" required />
+            <div class="actions">
+              <button class="save-btn" type="submit" id="submitBtn">Upload</button>
+              <span class="save-msg" id="saveMsg"></span>
             </div>
-            <div class="field field-full">
-              <label for="titleInput">Title</label>
-              <input id="titleInput" name="title" type="text" placeholder="Enter title" required />
-            </div>
-            <div class="field field-full">
-              <label for="descInput">Description</label>
-              <textarea id="descInput" name="description" placeholder="Enter description" required></textarea>
-            </div>
-            <div class="field field-full">
-              <label for="fileInput">File (PDF, PPT, PPTX)</label>
-              <input id="fileInput" name="file" type="file" accept=".pdf,.ppt,.pptx,application/pdf,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation" required />
-            </div>
-          </div>
-          <div class="actions">
-            <button class="save-btn" type="submit" id="submitBtn">Upload</button>
-            <span class="save-msg" id="saveMsg"></span>
-          </div>
-        </form>
-      </section>
-    </div>
+          </form>
+        </section>
+      </div>
+    </section>
   </main>
 
   <footer>
