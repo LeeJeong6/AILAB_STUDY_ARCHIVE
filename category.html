@@ -668,6 +668,23 @@
       viewLink.textContent = 'View Session';
       actions.appendChild(viewLink);
 
+      // Delete Session button (for all types except static seed entries)
+      if (entry.kind !== 'seed') {
+        const deleteSessionBtn = document.createElement('button');
+        deleteSessionBtn.type = 'button';
+        deleteSessionBtn.textContent = 'Delete Session';
+        deleteSessionBtn.className = 'delete-btn';
+        deleteSessionBtn.addEventListener('click', async () => {
+          const ok = window.confirm('Are you sure you want to delete this session? This action cannot be undone.');
+          if (!ok) {
+            return;
+          }
+          await deleteEntry(entry.id);
+          await renderEntries();
+        });
+        actions.appendChild(deleteSessionBtn);
+      }
+
       if (entry.kind === 'upload' && entry.fileBlob) {
         const openBtn = document.createElement('button');
         openBtn.type = 'button';
@@ -693,20 +710,6 @@
           setTimeout(() => URL.revokeObjectURL(url), 8000);
         });
         actions.appendChild(downloadBtn);
-
-        const deleteBtn = document.createElement('button');
-        deleteBtn.type = 'button';
-        deleteBtn.textContent = 'Delete';
-        deleteBtn.className = 'delete-btn';
-        deleteBtn.addEventListener('click', async () => {
-          const ok = window.confirm('Are you sure you want to delete this item?');
-          if (!ok) {
-            return;
-          }
-          await deleteEntry(entry.id);
-          await renderEntries();
-        });
-        actions.appendChild(deleteBtn);
       }
 
       card.append(dragHandle, meta, title, desc, file, actions);
