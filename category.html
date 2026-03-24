@@ -143,6 +143,34 @@
       margin-bottom: 1rem;
     }
 
+    .upload-toggle-btn {
+      border: none;
+      border-radius: var(--border-radius);
+      background: var(--color-primary);
+      color: var(--color-bg);
+      padding: 0.65rem 1.5rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color var(--transition);
+      margin-bottom: 2rem;
+      display: inline-block;
+    }
+
+    .upload-toggle-btn:hover {
+      background: var(--color-dark);
+    }
+
+    .upload-form-container {
+      display: none;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+    }
+
+    .upload-form-container.active {
+      display: block;
+    }
+
     .form-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -243,10 +271,31 @@
       padding: 1.5rem;
       box-shadow: 0 1px 3px rgba(0,0,0,.1);
       transition: all var(--transition);
+      cursor: grab;
+      position: relative;
     }
 
     .entry-card:hover {
       box-shadow: var(--shadow);
+    }
+
+    .entry-card.dragging {
+      opacity: 0.5;
+      cursor: grabbing;
+    }
+
+    .entry-card.drag-over {
+      border-top: 3px solid var(--color-primary);
+    }
+
+    .drag-handle {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      font-size: 1.2rem;
+      color: var(--color-text-secondary);
+      cursor: grab;
+      user-select: none;
     }
 
     .entry-meta {
@@ -375,42 +424,46 @@
       <h2 class="category-title" id="categoryTitle"></h2>
     </section>
 
-    <section class="upload-section">
-      <h3>📤 Upload New Material</h3>
-      <form id="uploadForm" novalidate>
-        <div class="form-grid">
-          <div class="field">
-            <label for="dateInput">Date</label>
-            <input id="dateInput" name="date" type="date" required />
-          </div>
-          <div class="field">
-            <label for="presenterInput">Presenter</label>
-            <input id="presenterInput" name="presenter" type="text" placeholder="e.g., John Doe" required />
-          </div>
-          <div class="field field-full">
-            <label for="titleInput">Title</label>
-            <input id="titleInput" name="title" type="text" placeholder="Enter title" required />
-          </div>
-          <div class="field field-full">
-            <label for="descInput">Description</label>
-            <textarea id="descInput" name="description" placeholder="Enter description" required></textarea>
-          </div>
-          <div class="field field-full">
-            <label for="fileInput">File (PDF, PPT, PPTX)</label>
-            <input id="fileInput" name="file" type="file" accept=".pdf,.ppt,.pptx,application/pdf,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation" required />
-          </div>
-        </div>
-        <div class="actions">
-          <button class="save-btn" type="submit" id="submitBtn">Upload</button>
-          <span class="save-msg" id="saveMsg"></span>
-        </div>
-      </form>
-    </section>
-
     <section>
       <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--color-dark); margin-bottom: 1.5rem;">Uploaded Materials</h2>
       <div class="entry-list" id="entryList"></div>
     </section>
+
+    <button class="upload-toggle-btn" id="uploadToggleBtn">📤 Upload New Material</button>
+
+    <div class="upload-form-container" id="uploadFormContainer">
+      <section class="upload-section">
+        <h3>📤 Upload New Material</h3>
+        <form id="uploadForm" novalidate>
+          <div class="form-grid">
+            <div class="field">
+              <label for="dateInput">Date</label>
+              <input id="dateInput" name="date" type="date" required />
+            </div>
+            <div class="field">
+              <label for="presenterInput">Presenter</label>
+              <input id="presenterInput" name="presenter" type="text" placeholder="e.g., John Doe" required />
+            </div>
+            <div class="field field-full">
+              <label for="titleInput">Title</label>
+              <input id="titleInput" name="title" type="text" placeholder="Enter title" required />
+            </div>
+            <div class="field field-full">
+              <label for="descInput">Description</label>
+              <textarea id="descInput" name="description" placeholder="Enter description" required></textarea>
+            </div>
+            <div class="field field-full">
+              <label for="fileInput">File (PDF, PPT, PPTX)</label>
+              <input id="fileInput" name="file" type="file" accept=".pdf,.ppt,.pptx,application/pdf,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation" required />
+            </div>
+          </div>
+          <div class="actions">
+            <button class="save-btn" type="submit" id="submitBtn">Upload</button>
+            <span class="save-msg" id="saveMsg"></span>
+          </div>
+        </form>
+      </section>
+    </div>
   </main>
 
   <footer>
@@ -459,6 +512,19 @@
 
     categoryTitle.textContent = CATEGORY_META[category].label;
 
+    // Upload form toggle
+    const uploadToggleBtn = document.getElementById('uploadToggleBtn');
+    const uploadFormContainer = document.getElementById('uploadFormContainer');
+
+    uploadToggleBtn.addEventListener('click', () => {
+      uploadFormContainer.classList.toggle('active');
+      if (uploadFormContainer.classList.contains('active')) {
+        uploadToggleBtn.textContent = '❌ Close Upload Form';
+      } else {
+        uploadToggleBtn.textContent = '📤 Upload New Material';
+      }
+    });
+
     function openDatabase() {
       return new Promise((resolve, reject) => {
         const request = indexedDB.open(DB_NAME, DB_VERSION);
@@ -469,6 +535,7 @@
             const uploadStore = db.createObjectStore(UPLOAD_STORE, { keyPath: 'id' });
             uploadStore.createIndex('category', 'category', { unique: false });
             uploadStore.createIndex('date', 'date', { unique: false });
+            uploadStore.createIndex('order', 'order', { unique: false });
           }
         };
 
@@ -515,6 +582,15 @@
           }));
 
         merged.sort((a, b) => {
+          // If both have order property, use it
+          if (typeof a.order === 'number' && typeof b.order === 'number') {
+            return a.order - b.order;
+          }
+          // If only one has order, prioritize it
+          if (typeof a.order === 'number') return -1;
+          if (typeof b.order === 'number') return 1;
+
+          // Otherwise, use date sorting
           const dateCompare = String(b.date || '').localeCompare(String(a.date || ''));
           if (dateCompare !== 0) {
             return dateCompare;
@@ -552,6 +628,14 @@
     function createEntryNode(entry) {
       const card = document.createElement('article');
       card.className = 'entry-card';
+      card.setAttribute('draggable', 'true');
+      card.dataset.entryId = entry.id;
+
+      // Add drag handle
+      const dragHandle = document.createElement('span');
+      dragHandle.className = 'drag-handle';
+      dragHandle.textContent = '⋮⋮';
+      dragHandle.title = 'Drag to reorder';
 
       const meta = document.createElement('p');
       meta.className = 'entry-meta';
@@ -625,7 +709,7 @@
         actions.appendChild(deleteBtn);
       }
 
-      card.append(meta, title, desc, file, actions);
+      card.append(dragHandle, meta, title, desc, file, actions);
       return card;
     }
 
@@ -642,8 +726,88 @@
       }
 
       entries.forEach((entry) => {
-        entryList.appendChild(createEntryNode(entry));
+        const card = createEntryNode(entry);
+        setupDragHandlers(card);
+        entryList.appendChild(card);
       });
+    }
+
+    let draggedElement = null;
+
+    function setupDragHandlers(card) {
+      card.addEventListener('dragstart', (e) => {
+        draggedElement = card;
+        card.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+
+      card.addEventListener('dragend', (e) => {
+        card.classList.remove('dragging');
+        draggedElement = null;
+        // Remove all drag-over classes
+        document.querySelectorAll('.entry-card').forEach(c => c.classList.remove('drag-over'));
+      });
+
+      card.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        if (draggedElement && draggedElement !== card) {
+          card.classList.add('drag-over');
+        }
+      });
+
+      card.addEventListener('dragleave', (e) => {
+        card.classList.remove('drag-over');
+      });
+
+      card.addEventListener('drop', async (e) => {
+        e.preventDefault();
+        card.classList.remove('drag-over');
+
+        if (!draggedElement || draggedElement === card) return;
+
+        // Reorder the cards visually
+        const allCards = Array.from(entryList.querySelectorAll('.entry-card'));
+        const draggedIndex = allCards.indexOf(draggedElement);
+        const targetIndex = allCards.indexOf(card);
+
+        if (draggedIndex < targetIndex) {
+          card.after(draggedElement);
+        } else {
+          card.before(draggedElement);
+        }
+
+        // Update order in database
+        await updateOrder();
+      });
+    }
+
+    async function updateOrder() {
+      const cards = Array.from(entryList.querySelectorAll('.entry-card'));
+      const db = await openDatabase();
+
+      const updates = cards.map((card, index) => {
+        const entryId = card.dataset.entryId;
+        return { id: entryId, order: index };
+      });
+
+      // Update all entries with new order
+      for (const update of updates) {
+        const tx = db.transaction(UPLOAD_STORE, 'readwrite');
+        const store = tx.objectStore(UPLOAD_STORE);
+        const getRequest = store.get(update.id);
+
+        await new Promise((resolve, reject) => {
+          getRequest.onsuccess = () => {
+            const entry = getRequest.result;
+            if (entry) {
+              entry.order = update.order;
+              store.put(entry);
+            }
+          };
+          tx.oncomplete = resolve;
+          tx.onerror = reject;
+        });
+      }
     }
 
     uploadForm.addEventListener('submit', async (event) => {
@@ -689,6 +853,13 @@
         setMessage('Successfully uploaded!', 'success');
         uploadForm.reset();
         await renderEntries();
+
+        // Close the upload form after successful upload
+        setTimeout(() => {
+          uploadFormContainer.classList.remove('active');
+          uploadToggleBtn.textContent = '📤 Upload New Material';
+          setMessage('', 'normal');
+        }, 1500);
       } catch (error) {
         console.error(error);
         setMessage('An error occurred during upload.', 'error');
