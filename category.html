@@ -486,6 +486,23 @@
     const params = new URLSearchParams(window.location.search);
     const category = params.get('cat');
 
+    // BroadcastChannel for real-time sync across tabs
+    const syncChannel = new BroadcastChannel('lab-seminar-sync');
+
+    syncChannel.onmessage = (event) => {
+      const { type, data } = event.data;
+      console.log('Category page received sync message:', type, data);
+
+      // Refresh the entries list when changes occur in other tabs
+      if (type === 'entry-added' || type === 'entry-deleted' || type === 'entry-reordered') {
+        renderEntries();
+      }
+    };
+
+    function broadcastChange(type, data) {
+      syncChannel.postMessage({ type, data });
+    }
+
     if (!CATEGORY_META[category]) {
       window.location.replace('index.html');
       throw new Error('Invalid category parameter');
@@ -668,6 +685,7 @@
           }
           await deleteEntry(entry.id);
           await renderEntries();
+          broadcastChange('entry-deleted', { id: entry.id, category });
         });
         actions.appendChild(deleteSessionBtn);
       }
@@ -768,6 +786,7 @@
 
         // Update order in database
         await updateOrder();
+        broadcastChange('entry-reordered', { category });
       });
     }
 
@@ -843,6 +862,7 @@
         setMessage('Successfully uploaded!', 'success');
         uploadForm.reset();
         await renderEntries();
+        broadcastChange('entry-added', { id: entry.id, category });
 
         // Close the upload form after successful upload
         setTimeout(() => {

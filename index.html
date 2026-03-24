@@ -209,12 +209,68 @@
       padding: 1.25rem;
       box-shadow: 0 1px 3px rgba(0,0,0,.1);
       transition: all var(--transition);
-      cursor: pointer;
+      cursor: grab;
+      position: relative;
     }
 
     .preview-card:hover {
       box-shadow: var(--shadow);
       transform: translateY(-1px);
+    }
+
+    .preview-card.dragging {
+      opacity: 0.5;
+      cursor: grabbing;
+    }
+
+    .preview-card.drag-over {
+      border-top: 3px solid var(--color-primary);
+    }
+
+    .preview-drag-handle {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      font-size: 1.2rem;
+      color: var(--color-text-secondary);
+      cursor: grab;
+      user-select: none;
+      z-index: 10;
+    }
+
+    .preview-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .preview-actions button {
+      border: 1px solid var(--color-primary);
+      border-radius: var(--border-radius);
+      background: var(--color-bg);
+      color: var(--color-primary);
+      padding: 0.35rem 0.85rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      transition: all var(--transition);
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .preview-actions button:hover {
+      background: var(--color-primary);
+      color: var(--color-bg);
+    }
+
+    .preview-actions .delete-btn {
+      border-color: #e74c3c;
+      color: #e74c3c;
+    }
+
+    .preview-actions .delete-btn:hover {
+      background: #e74c3c;
+      color: var(--color-bg);
     }
 
     .preview-meta {
@@ -618,6 +674,23 @@
 
     const previewBoard = document.getElementById('previewBoard');
 
+    // BroadcastChannel for real-time sync across tabs
+    const syncChannel = new BroadcastChannel('lab-seminar-sync');
+
+    syncChannel.onmessage = (event) => {
+      const { type, data } = event.data;
+      console.log('Received sync message:', type, data);
+
+      // Refresh the preview board when changes occur in other tabs
+      if (type === 'entry-added' || type === 'entry-deleted' || type === 'entry-reordered') {
+        renderPreviewBoard();
+      }
+    };
+
+    function broadcastChange(type, data) {
+      syncChannel.postMessage({ type, data });
+    }
+
     function openDatabase() {
       return new Promise((resolve, reject) => {
         const request = indexedDB.open(DB_NAME, DB_VERSION);
@@ -673,10 +746,15 @@
 
     function previewCard(entry) {
       return `
-        <article class="preview-card" data-entry-id="${entry.id}" data-category="${entry.category}">
+        <article class="preview-card" draggable="true" data-entry-id="${entry.id}" data-category="${entry.category}">
+          <span class="preview-drag-handle" title="Drag to reorder">⋮⋮</span>
           <div class="preview-meta">${entry.date || '-'} · ${entry.presenter || '-'}</div>
           <h4 class="preview-title">${escapeHtml(entry.title || '(No Title)')}</h4>
           <p class="preview-desc">${escapeHtml(entry.description || '')}</p>
+          <div class="preview-actions">
+            <button class="view-btn" data-action="view">View Session</button>
+            <button class="delete-btn" data-action="delete">Delete</button>
+          </div>
         </article>
       `;
     }
@@ -690,6 +768,112 @@
         .replaceAll("'", '&#39;');
     }
 
+    // Drag and drop functionality for preview cards
+    let draggedPreviewElement = null;
+
+    function setupPreviewDragHandlers(card, categoryKey) {
+      card.addEventListener('dragstart', (e) => {
+        draggedPreviewElement = card;
+        card.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+
+      card.addEventListener('dragend', (e) => {
+        card.classList.remove('dragging');
+        draggedPreviewElement = null;
+        // Remove all drag-over classes
+        document.querySelectorAll('.preview-card').forEach(c => c.classList.remove('drag-over'));
+      });
+
+      card.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        if (draggedPreviewElement && draggedPreviewElement !== card) {
+          // Only allow dragging within the same category
+          if (draggedPreviewElement.dataset.category === card.dataset.category) {
+            card.classList.add('drag-over');
+          }
+        }
+      });
+
+      card.addEventListener('dragleave', (e) => {
+        card.classList.remove('drag-over');
+      });
+
+      card.addEventListener('drop', async (e) => {
+        e.preventDefault();
+        card.classList.remove('drag-over');
+
+        if (!draggedPreviewElement || draggedPreviewElement === card) return;
+
+        // Only allow dropping within the same category
+        if (draggedPreviewElement.dataset.category !== card.dataset.category) return;
+
+        const list = card.closest('.preview-list');
+        const allCards = Array.from(list.querySelectorAll('.preview-card'));
+        const draggedIndex = allCards.indexOf(draggedPreviewElement);
+        const targetIndex = allCards.indexOf(card);
+
+        if (draggedIndex < targetIndex) {
+          card.after(draggedPreviewElement);
+        } else {
+          card.before(draggedPreviewElement);
+        }
+
+        // Update order in database
+        await updatePreviewOrder(categoryKey);
+        broadcastChange('entry-reordered', { category: categoryKey });
+      });
+    }
+
+    async function updatePreviewOrder(categoryKey) {
+      const list = document.querySelector(`.preview-list[data-category="${categoryKey}"]`);
+      if (!list) return;
+
+      const cards = Array.from(list.querySelectorAll('.preview-card'));
+      const db = await openDatabase();
+
+      for (let i = 0; i < cards.length; i++) {
+        const entryId = cards[i].dataset.entryId;
+        const tx = db.transaction(UPLOAD_STORE, 'readwrite');
+        const store = tx.objectStore(UPLOAD_STORE);
+        const getRequest = store.get(entryId);
+
+        await new Promise((resolve, reject) => {
+          getRequest.onsuccess = () => {
+            const entry = getRequest.result;
+            if (entry) {
+              entry.order = i;
+              store.put(entry);
+            }
+          };
+          tx.oncomplete = resolve;
+          tx.onerror = reject;
+        });
+      }
+    }
+
+    async function handlePreviewDelete(entryId, categoryKey) {
+      const ok = window.confirm('Are you sure you want to delete this session? This action cannot be undone.');
+      if (!ok) return;
+
+      try {
+        const db = await openDatabase();
+        await new Promise((resolve, reject) => {
+          const tx = db.transaction(UPLOAD_STORE, 'readwrite');
+          const store = tx.objectStore(UPLOAD_STORE);
+          store.delete(entryId);
+          tx.oncomplete = resolve;
+          tx.onerror = reject;
+        });
+
+        await renderPreviewBoard();
+        broadcastChange('entry-deleted', { id: entryId, category: categoryKey });
+      } catch (error) {
+        console.error('Failed to delete entry:', error);
+        alert('Failed to delete session. Please try again.');
+      }
+    }
+
     async function renderPreviewBoard() {
       const uploads = await loadUploads();
       previewBoard.innerHTML = '';
@@ -700,12 +884,14 @@
 
         const wrapper = document.createElement('section');
         wrapper.className = 'preview-group';
+        wrapper.dataset.category = categoryKey;
 
         const title = document.createElement('h3');
         title.textContent = category.label;
 
         const list = document.createElement('div');
         list.className = 'preview-list';
+        list.dataset.category = categoryKey;
 
         if (categoryEntries.length === 0) {
           const empty = document.createElement('p');
@@ -720,9 +906,23 @@
             cardDiv.innerHTML = previewCard(entry);
             const card = cardDiv.firstElementChild;
 
-            // Add click handler to navigate to session page
-            card.addEventListener('click', () => {
-              window.location.href = `session.html?id=${entry.id}&cat=${categoryKey}`;
+            // Setup drag and drop handlers
+            setupPreviewDragHandlers(card, categoryKey);
+
+            // Add event delegation for buttons
+            card.addEventListener('click', (e) => {
+              const action = e.target.dataset.action;
+
+              if (action === 'view') {
+                e.stopPropagation();
+                window.location.href = `session.html?id=${entry.id}&cat=${categoryKey}`;
+              } else if (action === 'delete') {
+                e.stopPropagation();
+                handlePreviewDelete(entry.id, categoryKey);
+              } else if (!e.target.closest('.preview-actions') && !e.target.closest('.preview-drag-handle')) {
+                // Click on card body - navigate to session
+                window.location.href = `session.html?id=${entry.id}&cat=${categoryKey}`;
+              }
             });
 
             list.appendChild(card);
@@ -907,6 +1107,7 @@ Audio file: ${audioFileName}
 
       alert(`Recording saved successfully to ${CATEGORY_META[category].label}!`);
       renderPreviewBoard();
+      broadcastChange('entry-added', { id: entry.id, category });
     }
 
     // Add click handler for site title
