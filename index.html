@@ -614,18 +614,7 @@
       math: { label: 'Math Study', link: 'category.html?cat=math' }
     };
 
-    const STATIC_ENTRIES = [
-      {
-        id: 'seed-paper-2026-03-20',
-        category: 'paper',
-        date: '2026-03-20',
-        presenter: 'Jeongik Lee',
-        title: 'GroupViT: Semantic Segmentation Emerges from Text Supervision',
-        description: 'Presentation covering the core ideas of GroupViT for semantic segmentation using only text supervision.',
-        kind: 'seed',
-        createdAt: '2026-03-20T09:00:00.000Z'
-      }
-    ];
+    const STATIC_ENTRIES = [];
 
     const previewBoard = document.getElementById('previewBoard');
 
@@ -707,8 +696,7 @@
 
       Object.keys(CATEGORY_META).forEach((categoryKey) => {
         const category = CATEGORY_META[categoryKey];
-        // Show empty state - don't display any entries
-        const categoryEntries = [];
+        const categoryEntries = mergeEntriesByCategory(uploads, categoryKey);
 
         const wrapper = document.createElement('section');
         wrapper.className = 'preview-group';
@@ -719,10 +707,27 @@
         const list = document.createElement('div');
         list.className = 'preview-list';
 
-        const empty = document.createElement('p');
-        empty.className = 'preview-empty';
-        empty.textContent = 'No uploaded items yet.';
-        list.appendChild(empty);
+        if (categoryEntries.length === 0) {
+          const empty = document.createElement('p');
+          empty.className = 'preview-empty';
+          empty.textContent = 'No uploaded items yet.';
+          list.appendChild(empty);
+        } else {
+          // Show up to 3 most recent entries
+          const recentEntries = categoryEntries.slice(0, 3);
+          recentEntries.forEach((entry) => {
+            const cardDiv = document.createElement('div');
+            cardDiv.innerHTML = previewCard(entry);
+            const card = cardDiv.firstElementChild;
+
+            // Add click handler to navigate to session page
+            card.addEventListener('click', () => {
+              window.location.href = `session.html?id=${entry.id}&cat=${categoryKey}`;
+            });
+
+            list.appendChild(card);
+          });
+        }
 
         const moreLink = document.createElement('a');
         moreLink.className = 'preview-more';
